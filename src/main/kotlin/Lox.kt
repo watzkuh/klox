@@ -1,5 +1,6 @@
 import java.io.File
 import java.nio.charset.Charset
+import kotlin.math.exp
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
@@ -15,11 +16,12 @@ fun main(args: Array<String>) {
 
 class Lox {
 
+    private final val interpreter = Interpreter()
+
     fun runFile(path: String) {
         exec(File(path).readText(Charset.defaultCharset()))
-        if (hadError) {
-            exitProcess(65)
-        }
+        if (hadError) exitProcess(65)
+        if (hadRuntimeError) exitProcess(70)
     }
 
     fun runPrompt() {
@@ -34,16 +36,32 @@ class Lox {
     private fun exec(source: String) {
         val scanner = Scanner(source)
         val tokens = scanner.scanTokens()
-        for (token in tokens) {
-            println(token)
-        }
+        val parser = Parser(tokens)
+        val statements = parser.parse()
+
+        if (hadError) return
+
+        interpreter.interpret(statements)
     }
 
     companion object Error {
         private var hadError = false
+        private var hadRuntimeError = false
 
         fun error(line: Int, message: String) {
             report(line, "", message)
+        }
+
+        fun error(token: Token, message: String) {
+            if (token.type == TokenType.EOF) {
+                report(token.line, " at end", message)
+            } else {
+                report(token.line, " at '" + token.lexeme + "'", message)
+            }
+        }
+
+        fun runtimeError(error: RuntimeError) {
+            println("${error.message} \n[line ${error.token.line}]")
         }
 
         private fun report(line: Int, where: String, message: String) {
