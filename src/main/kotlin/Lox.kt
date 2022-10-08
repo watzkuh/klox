@@ -1,6 +1,5 @@
 import java.io.File
 import java.nio.charset.Charset
-import kotlin.math.exp
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
@@ -16,7 +15,7 @@ fun main(args: Array<String>) {
 
 class Lox {
 
-    private final val interpreter = Interpreter()
+    private val interpreter = Interpreter()
 
     fun runFile(path: String) {
         exec(File(path).readText(Charset.defaultCharset()))
