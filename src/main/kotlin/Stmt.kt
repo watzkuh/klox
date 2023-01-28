@@ -5,6 +5,7 @@ abstract class Stmt {
         fun visitExpressionStmt(stmt: Expression)
         fun visitPrintStmt(stmt: Print)
         fun visitVarStmt(stmt: Var)
+        fun visitIfStmt(stmt: If)
     }
 
     abstract fun <R> accept(visitor: Visitor<R>)
@@ -31,6 +32,11 @@ abstract class Stmt {
         override fun <R> accept(visitor: Visitor<R>) {
             return visitor.visitVarStmt(this)
         }
+    }
 
+    class If(val condition: Expr, val thenBranch: Stmt, val elseBranch: Stmt?) : Stmt() {
+        override fun <R> accept(visitor: Visitor<R>) {
+            return visitor.visitIfStmt(this)
+        }
     }
 }
